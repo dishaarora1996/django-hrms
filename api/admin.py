@@ -4,3 +4,6 @@ from .models import *
 
 
 admin.site.register(Holiday)
+admin.site.register(Compensation)
+admin.site.register(Project)
+admin.site.register(Client)

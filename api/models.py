@@ -19,7 +19,7 @@ class Compensation(models.Model):
     hra = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.name
+        return self.employee.email
     
 
 class Project(models.Model):
