@@ -5,6 +5,7 @@ from .serializers import *
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsManager, IsHR, IsEmployeeOrManager
 from account.renderers import UserRenderer
 from account.models import User 
 
@@ -14,17 +15,22 @@ from account.models import User
 
 class HolidayListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHR]
 
-    def get(self, request, format=None):
-        holiday = Holiday.objects.all()
+    def post(self, request, format=None):
+        text = request.data.get("data", None)
+        if text:
+            holiday = Holiday.objects.filter(name=text)
+        else:
+            holiday = Holiday.objects.all()
+            
         serializer = HolidaySerializer(holiday, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class HREmployeeListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHR]
 
     def get(self, request, format=None):
         user = User.objects.filter(is_onboarding=1)
@@ -34,7 +40,7 @@ class HREmployeeListView(APIView):
 
 class HROnboardingListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHR]
 
     def get(self, request, format=None):
         user = User.objects.filter(is_onboarding=0)
@@ -43,7 +49,7 @@ class HROnboardingListView(APIView):
     
 class HRCompensationListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHR]
 
     def get(self, request, format=None):
         user = User.objects.filter(is_onboarding=1)
@@ -52,7 +58,7 @@ class HRCompensationListView(APIView):
     
 class HRProjectListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHR]
 
     def get(self, request, format=None):
         project = Project.objects.all()
@@ -62,7 +68,7 @@ class HRProjectListView(APIView):
 
 class CompensationDetailView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsEmployeeOrManager]
 
     def get(self, request, format=None):
         compensation = Compensation.objects.get(employee=request.user)
@@ -70,9 +76,9 @@ class CompensationDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-class ProjectDetailView(APIView):
+class ProjectListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsEmployeeOrManager]
 
     def get(self, request, format=None):
         project = Project.objects.filter(employee=request.user)
@@ -81,10 +87,25 @@ class ProjectDetailView(APIView):
 
 class ClientListView(APIView):
     renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsManager]
 
     def get(self, request, format=None):
         client = Client.objects.filter(project__employee=request.user).order_by('name').distinct('name')
         serializer = ClientSerializer(client, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class ManagerEmployeeListView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated, IsManager]
+
+    filterset_fields = ['name']
+
+    def get(self, request, format=None):
+        emp_list=[]
+        project = Project.objects.filter(employee=request.user)
+        for i in project:
+            employee = User.objects.filter(project=i).order_by('id').values()
+            emp_list = {v['id']:v for v in employee}.values()
+
+        serializer = EmployeeSerializer(emp_list, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

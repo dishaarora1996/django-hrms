@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'account.apps.AccountConfig',
-    'api',
+    'api.apps.ApiConfig',
+    'rest_framework.authtoken',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -90,14 +92,20 @@ DATABASES = {
 
 
 
-
 REST_FRAMEWORK = {
-    
+
+    #     'DEFAULT_AUTHENTICATION_CLASSES': [
+
+    #          'rest_framework.authentication.TokenAuthentication'
+
+    #  ]
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    
-    
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+
 }
 
 # Password validation
@@ -147,7 +155,7 @@ AUTH_USER_MODEL = 'account.User'
 
 #JWT Settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 
     "AUTH_HEADER_TYPES": ("Bearer",),

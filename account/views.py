@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from .renderers import UserRenderer
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 
 # Generate Token Manually
 def get_tokens_for_user(user):
@@ -37,4 +39,23 @@ class UserLoginView(APIView):
                     'Email or Password is not valid'},
                     status=status.HTTP_404_NOT_FOUND)
             
-        
+
+# class CustomAuthToken(ObtainAuthToken):
+
+#     # def post(self, request, *args, **kwargs):
+#     #     serializer = AuthTokenSerializer(data=request.data)
+#     #     if serializer.is_valid(raise_exception=True):
+#     #         print(f"User*****************: {serializer.validated_data['user']}")
+#     #         user = serializer.validated_data['user']
+#     #         # token, created = Token.objects.get_or_create(user=user)
+#     #         return Response({
+#     #             'msg': 'OK',
+#     #             'user': user.email
+#     #         })
+            
+#     #     return Response({
+#     #                 'msg': 'Not Valid'
+#     #             })
+
+#     """Create a new auth token for user"""
+#     serializer_class = AuthTokenSerializer

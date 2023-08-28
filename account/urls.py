@@ -3,4 +3,5 @@ from .views import *
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name="login"),
+    # path('api-token-auth/', CustomAuthToken.as_view())
 ]

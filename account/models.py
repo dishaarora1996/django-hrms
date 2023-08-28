@@ -2,6 +2,8 @@ from django.db import models
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
+from django.contrib.auth.signals import user_logged_in
+
 
 # Create your models here.
 
@@ -87,3 +89,6 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+
+

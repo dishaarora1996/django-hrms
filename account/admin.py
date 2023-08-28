@@ -9,7 +9,7 @@ class UserModelAdmin(BaseUserAdmin):
     # These override the definitions on the base UserModelAdmin
     # that reference specific fields on auth.User.
    
-    list_display = ('email', 'name', 'last_login', 'is_admin', 'is_staff')
+    list_display = ('id', 'email', 'name', 'role', 'is_onboarding', 'is_staff')
     search_fields = ('email', 'name',)
     # readonly_fields = ('date_joined', 'last_login',)
 
